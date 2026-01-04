@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Задания</title>
+
+  <style>
+    :root {
+      --bg: #0f0f0f;
+      --card: #181818;
+      --border: #2a2a2a;
+      --text: #f5f5f5;
+      --muted: #a0a0a0;
+
+      --yellow: #facc15;
+      --green: #22c55e;
+      --red: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 60px 20px;
+      background: var(--bg);
+      font-family: Arial, sans-serif;
+      color: var(--text);
+    }
+
+    .card {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 32px;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    h1 {
+      margin: 0 0 24px;
+      font-size: 22px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th {
+      text-align: left;
+      padding: 12px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      font-weight: normal;
+    }
+
+    td {
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    tr:hover {
+      background: #1f1f1f;
+    }
+
+    a {
+      color: var(--yellow);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .status {
+      font-weight: bold;
+    }
+
+    .queued {
+      color: var(--yellow);
+    }
+
+    .processing {
+      color: var(--yellow);
+      animation: blink 1.4s infinite;
+    }
+
+    .completed {
+      color: var(--green);
+    }
+
+    .error {
+      color: var(--red);
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .error-row {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--red);
+      font-size: 13px;
+    }
+
+    .footer-link {
+      display: block;
+      margin-top: 26px;
+      text-align: center;
+      color: var(--green);
+      text-decoration: none;
+    }
+
+    .footer-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h1>Список заданий</h1>
+
+    <table>
+      <tr>
+        <th>Дата</th>
+        <th>ID</th>
+        <th>Название</th>
+        <th>Видео</th>
+        <th>Статус</th>
+        <th>PDF</th>
+      </tr>
+
+      {% for task in tasks %}
+      <tr>
+        <td>{{ task.created_at }}</td>
+        <td>{{ task.id }}</td>
+        <td>{{ task.title }}</td>
+        <td><a href="{{ task.yandex_disk_url }}" target="_blank">Открыть</a></td>
+        <td class="status {{ task.status }}">
+          {% if task.status == "queued" %}В очереди
+          {% elif task.status == "processing" %}В обработке
+          {% elif task.status == "completed" %}Готово
+          {% elif task.status == "error" %}Ошибка
+          {% else %}{{ task.status }}{% endif %}
+        </td>
+        <td>
+          {% if task.status == "completed" and task.result_pdf_url %}
+            <a href="{{ task.result_pdf_url }}" target="_blank">PDF</a>
+          {% else %}—{% endif %}
+        </td>
+      </tr>
+
+      {% if task.status == "error" and task.error_message %}
+      <tr class="error-row">
+        <td colspan="6">Ошибка: {{ task.error_message }}</td>
+      </tr>
+      {% endif %}
+      {% endfor %}
+    </table>
+
+    <a class="footer-link" href="/">Создать новое задание</a>
+  </div>
+</body>
+</html>
